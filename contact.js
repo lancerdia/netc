@@ -1,5 +1,3 @@
-// contact.js
-
 // 获取子域名并存储在全局变量中
 const cid = window.location.hostname.split('.')[0];
 
