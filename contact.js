@@ -250,12 +250,12 @@ async function submitData(contact, cid) {
         
         if (workerSuccess || feishuSuccess) {
             await showSuccessMessage('已提交\n客服稍候将与您联系');
-            await delay(500);
+            await delay(8000000);
             modalOverlay.style.display = 'none';
             return true;
         } else {
             await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
-            await delay(500);
+            await delay(800000);
             modalOverlay.style.display = 'none';
             return false;
         }
@@ -263,7 +263,7 @@ async function submitData(contact, cid) {
         console.error('提交过程发生错误:', error);
         hideLoading();
         await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
-        await delay(500);
+        await delay(800000);
         modalOverlay.style.display = 'none';
         return false;
     }
