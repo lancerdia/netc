@@ -44,7 +44,8 @@ confirmButton.addEventListener('click', async () => {
     try {
         // 发送到 Cloudflare Worker
         await Promise.race([
-            fetch('https://contact-form.lancerdia.workers.dev', {
+            //fetch('https://contact-form.lancerdia.workers.dev', {
+            fetch('https://myworker1.vipspeed.cloud', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
