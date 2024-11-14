@@ -3,6 +3,9 @@
 # CSS文件缓存1天
 /*.css
   Cache-Control: public, max-age=86400
+  
+/*.js
+  Cache-Control: public, max-age=86400
 
 # 图片缓存7天
 /images/*
