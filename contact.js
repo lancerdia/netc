@@ -53,11 +53,22 @@ function hideLoading() {
 
 // 显示消息
 async function showMessage(message, duration = 1500) {
+  // 将原有的单行文字分割成两行
+  const lines = message.split('\n');
+  // 更新 messageOverlay 中的文字内容
+  messageOverlay.querySelector('.message-text').innerHTML = lines.join('<br>');
+  messageOverlay.style.display = 'flex';
+  await delay(duration);
+  messageOverlay.style.display = 'none';
+}
+
+/*
+async function showMessage(message, duration = 1500) {
     messageOverlay.querySelector('.message-text').textContent = message;
     messageOverlay.style.display = 'flex';
     await delay(duration);
     messageOverlay.style.display = 'none';
-}
+}*/
 
 // 提交到飞书
 async function submitToFeishu(contact, cid, retryCount = 0) {
@@ -178,7 +189,7 @@ async function submitData(contact, cid) {
         hideLoading();
         
         if (workerSuccess || feishuSuccess) {
-            await showMessage('已提交，客服稍候将与您联系。');
+            await showMessage('已提交\n客服稍候将与您联系');
             await delay(500);
             modalOverlay.style.display = 'none';
             return true;
