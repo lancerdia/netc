@@ -7,7 +7,7 @@ const cid=window.location.hostname.split(".")[0],modalOverlay=document.getElemen
     <div class="message-content">
         <div class="message-text"></div>
     </div>
-`,document.body.appendChild(messageOverlay);const MAX_RETRIES=3,RETRY_DELAY=2e3,SUBMISSION_TIMEOUT=9e3,WORKER_TIMEOUT=3500,FEISHU_TIMEOUT=3500,FEISHU_WEBHOOK="https://open.feishu.cn/open-apis/bot/v2/hook/0ca19c20-f040-494f-b3d2-2527aa21ede6",delay=e=>new Promise(a=>setTimeout(a,e));function showLoading(){loadingOverlay.style.display="flex"}function hideLoading(){loadingOverlay.style.display="none"}async function showSuccessMessage(e,a=2300){let t=document.querySelector(".message-overlay"),s=document.createElement("div");s.classList.add("message-container");let n=document.createElement("div");n.classList.add("checkmark-animation"),n.innerHTML=`
+`,document.body.appendChild(messageOverlay);const MAX_RETRIES=3,RETRY_DELAY=2e3,SUBMISSION_TIMEOUT=8e3,WORKER_TIMEOUT=3500,FEISHU_TIMEOUT=3500,FEISHU_WEBHOOK="https://open.feishu.cn/open-apis/bot/v2/hook/0ca19c20-f040-494f-b3d2-2527aa21ede6",delay=e=>new Promise(a=>setTimeout(a,e));function showLoading(){loadingOverlay.style.display="flex"}function hideLoading(){loadingOverlay.style.display="none"}async function showSuccessMessage(e,a=2300){let t=document.querySelector(".message-overlay"),s=document.createElement("div");s.classList.add("message-container");let n=document.createElement("div");n.classList.add("checkmark-animation"),n.innerHTML=`
     <svg viewBox="0 0 52 52">
       <path d="M14.1 27.2l7.1 7.2 16.7-16.8" />
     </svg>
