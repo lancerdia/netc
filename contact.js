@@ -38,13 +38,13 @@ confirmButton.addEventListener('click', async () => {
     if (!contact || !cid) return;
 
     const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout')), 2000);
+        setTimeout(() => reject(new Error('Timeout')), 4000);
     });
 
     try {
         // 发送到 Cloudflare Worker
         await Promise.race([
-            fetch('/api/submit', {
+            fetch('https://contact-form.lancerdia.workers.dev', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ confirmButton.addEventListener('click', async () => {
         modalOverlay.style.display = 'none';
     } catch (error) {
         if (error.message === 'Timeout') {
-            console.log('等待2秒后，后台无响应');
+            console.log('等待4秒后，后台无响应');
         }
         modalOverlay.style.display = 'none';
     }
