@@ -52,6 +52,66 @@ function hideLoading() {
 }
 
 // 显示消息
+async function showSuccessMessage(message, duration = 1500) {
+  const messageOverlay = document.querySelector('.message-overlay');
+  const messageContainer = document.createElement('div');
+  messageContainer.classList.add('message-container');
+
+  const checkmarkAnimation = document.createElement('div');
+  checkmarkAnimation.classList.add('checkmark-animation');
+  checkmarkAnimation.innerHTML = `
+    <svg viewBox="0 0 52 52">
+      <path d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+    </svg>
+  `;
+  messageContainer.appendChild(checkmarkAnimation);
+
+  const messageText = document.createElement('div');
+  messageText.classList.add('message-text');
+  messageText.textContent = message.replace('\n', '\n');
+  messageContainer.appendChild(messageText);
+
+  messageOverlay.classList.add('success');
+  messageOverlay.appendChild(messageContainer);
+  messageOverlay.style.display = 'flex';
+
+  await delay(duration);
+
+  messageOverlay.style.display = 'none';
+  messageOverlay.innerHTML = '';
+  messageOverlay.classList.remove('success');
+}
+
+async function showErrorMessage(message, duration = 1500) {
+  const messageOverlay = document.querySelector('.message-overlay');
+  const messageContainer = document.createElement('div');
+  messageContainer.classList.add('message-container');
+
+  const xAnimation = document.createElement('div');
+  xAnimation.classList.add('x-animation');
+  xAnimation.innerHTML = `
+    <svg viewBox="0 0 52 52">
+      <path d="M35.7 16.3l-19.4 19.4M16.3 16.3l19.4 19.4" />
+    </svg>
+  `;
+  messageContainer.appendChild(xAnimation);
+
+  const messageText = document.createElement('div');
+  messageText.classList.add('message-text');
+  messageText.textContent = message.replace('\n', '\n');
+  messageContainer.appendChild(messageText);
+
+  messageOverlay.classList.add('error');
+  messageOverlay.appendChild(messageContainer);
+  messageOverlay.style.display = 'flex';
+
+  await delay(duration);
+
+  messageOverlay.style.display = 'none';
+  messageOverlay.innerHTML = '';
+  messageOverlay.classList.remove('error');
+}
+
 async function showMessage(message, duration = 1500) {
   // 将原有的单行文字分割成两行
   const lines = message.split('\n');
@@ -189,12 +249,12 @@ async function submitData(contact, cid) {
         hideLoading();
         
         if (workerSuccess || feishuSuccess) {
-            await showMessage('已提交\n客服稍候将与您联系');
+            await showSuccessMessage('已提交\n客服稍候将与您联系');
             await delay(500);
             modalOverlay.style.display = 'none';
             return true;
         } else {
-            await showMessage('抱歉！提交失败，请联系我司工作人员人工处理。');
+            await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
             await delay(500);
             modalOverlay.style.display = 'none';
             return false;
@@ -202,7 +262,7 @@ async function submitData(contact, cid) {
     } catch (error) {
         console.error('提交过程发生错误:', error);
         hideLoading();
-        await showMessage('抱歉！提交失败，请联系我司工作人员人工处理。');
+        await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
         await delay(500);
         modalOverlay.style.display = 'none';
         return false;
