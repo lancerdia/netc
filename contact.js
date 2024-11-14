@@ -32,8 +32,9 @@ document.body.appendChild(messageOverlay);
 // Configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000; // 2秒
-const SUBMISSION_TIMEOUT = 4000; // 4秒
-const RETRY_TIMEOUT = 2000; // 2秒重试阈值
+const SUBMISSION_TIMEOUT = 7000; // 总体提交超时时间保持7秒
+const WORKER_TIMEOUT = 3500; // Worker 单次请求超时改为3.5秒
+const FEISHU_TIMEOUT = 3500; // 飞书单次请求超时改为3.5秒
 const FEISHU_WEBHOOK = 'https://open.feishu.cn/open-apis/bot/v2/hook/0ca19c20-f040-494f-b3d2-2527aa21ede6';
 const FEISHU_KEY = 'QLIG0SgEX8k2ppB3CaVuOc';
 
@@ -60,38 +61,43 @@ async function showMessage(message, duration = 1500) {
 
 // 提交到飞书
 async function submitToFeishu(contact, cid, retryCount = 0) {
-    const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout')), RETRY_TIMEOUT);
-    });
-
     try {
-        const response = await Promise.race([
-            fetch(FEISHU_WEBHOOK, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    msg_type: 'text',
-                    content: {
-                        text: `新联系方式提交\n联系方式: ${contact}\n子域名: ${cid}`
-                    }
-                })
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FEISHU_TIMEOUT);
+
+        const response = await fetch(FEISHU_WEBHOOK, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                msg_type: 'text',
+                content: {
+                    text: `新联系方式提交\n联系方式: ${contact}\n子域名: ${cid}`
+                }
             }),
-            timeoutPromise
-        ]);
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        return true;
+        const data = await response.json();
+        return data.StatusCode === 0 || data.code === 0;
+
     } catch (error) {
         console.error('飞书提交失败:', error);
-        if (retryCount < MAX_RETRIES) {
+        
+        // 如果是超时或网络错误，且还有重试次数，则重试
+        if ((error.name === 'AbortError' || error.name === 'TypeError') && retryCount < MAX_RETRIES) {
+            console.log(`飞书提交超时，正在进行第${retryCount + 1}次重试`);
             await delay(RETRY_DELAY);
             return submitToFeishu(contact, cid, retryCount + 1);
         }
+        
         return false;
     }
 }
@@ -99,33 +105,39 @@ async function submitToFeishu(contact, cid, retryCount = 0) {
 // 提交到 Cloudflare Worker
 async function submitToWorker(contact, cid, retryCount = 0) {
     const endpoint = 'https://myworker1.vipspeed.cloud/api/submit';
-    const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout')), RETRY_TIMEOUT);
-    });
-
+    
     try {
-        const response = await Promise.race([
-            fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ contact, cid })
-            }),
-            timeoutPromise
-        ]);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), WORKER_TIMEOUT);
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ contact, cid }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        return true;
+        const data = await response.json();
+        return data.status === 'success';
+
     } catch (error) {
         console.error('Worker提交失败:', error);
-        if (retryCount < MAX_RETRIES) {
+        
+        // 如果是超时或网络错误，且还有重试次数，则重试
+        if ((error.name === 'AbortError' || error.name === 'TypeError') && retryCount < MAX_RETRIES) {
+            console.log(`Worker提交超时，正在进行第${retryCount + 1}次重试`);
             await delay(RETRY_DELAY);
             return submitToWorker(contact, cid, retryCount + 1);
         }
+        
         return false;
     }
 }
@@ -136,37 +148,47 @@ async function submitData(contact, cid) {
     
     let workerSuccess = false;
     let feishuSuccess = false;
+    let workerPromise = submitToWorker(contact, cid);
+    let feishuPromise = submitToFeishu(contact, cid);
     
-    // 启动两个提交过程
-    const workerPromise = submitToWorker(contact, cid);
-    const feishuPromise = submitToFeishu(contact, cid);
-    
-    // 开始计时和检查
     const startTime = Date.now();
     
-    while (Date.now() - startTime < SUBMISSION_TIMEOUT) {
-        // 检查 Worker 响应
-        if (!workerSuccess) {
-            workerSuccess = await Promise.race([workerPromise, delay(1000)]);
-            if (workerSuccess) break;
+    try {
+        // 使用 Promise.race 同时等待两个提交结果和总超时
+        const timeoutPromise = new Promise(resolve => setTimeout(resolve, SUBMISSION_TIMEOUT));
+        
+        while (Date.now() - startTime < SUBMISSION_TIMEOUT) {
+            // 检查 Worker 响应
+            if (!workerSuccess) {
+                workerSuccess = await Promise.race([workerPromise, delay(1000)]);
+                if (workerSuccess) break;
+            }
+            
+            // 检查飞书响应
+            if (!feishuSuccess) {
+                feishuSuccess = await Promise.race([feishuPromise, delay(1000)]);
+            }
+            
+            if (workerSuccess || feishuSuccess) break;
+            await delay(1000);
         }
         
-        // 检查飞书响应
-        if (!feishuSuccess) {
-            feishuSuccess = await Promise.race([feishuPromise, delay(1000)]);
-        }
+        hideLoading();
         
-        await delay(1000);
-    }
-    
-    hideLoading();
-    
-    if (workerSuccess || feishuSuccess) {
-        await showMessage('已提交，客服稍候将与您联系。');
-        await delay(500);
-        modalOverlay.style.display = 'none';
-        return true;
-    } else {
+        if (workerSuccess || feishuSuccess) {
+            await showMessage('已提交，客服稍候将与您联系。');
+            await delay(500);
+            modalOverlay.style.display = 'none';
+            return true;
+        } else {
+            await showMessage('抱歉！提交失败，请联系我司工作人员人工处理。');
+            await delay(500);
+            modalOverlay.style.display = 'none';
+            return false;
+        }
+    } catch (error) {
+        console.error('提交过程发生错误:', error);
+        hideLoading();
         await showMessage('抱歉！提交失败，请联系我司工作人员人工处理。');
         await delay(500);
         modalOverlay.style.display = 'none';
