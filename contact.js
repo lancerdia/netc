@@ -32,7 +32,7 @@ document.body.appendChild(messageOverlay);
 // Configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000; // 2秒
-const SUBMISSION_TIMEOUT = 7000; // 总体提交超时时间保持7秒
+const SUBMISSION_TIMEOUT = 9000; // 总体提交超时时间保持9秒
 const WORKER_TIMEOUT = 3500; // Worker 单次请求超时改为3.5秒
 const FEISHU_TIMEOUT = 3500; // 飞书单次请求超时改为3.5秒
 const FEISHU_WEBHOOK = 'https://open.feishu.cn/open-apis/bot/v2/hook/0ca19c20-f040-494f-b3d2-2527aa21ede6';
@@ -85,6 +85,7 @@ async function submitToFeishu(contact, cid, retryCount = 0) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+        console.log(`飞书提交成功`);
         const data = await response.json();
         return data.StatusCode === 0 || data.code === 0;
 
@@ -125,6 +126,7 @@ async function submitToWorker(contact, cid, retryCount = 0) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+        console.log(`Worker提交成功`);
         const data = await response.json();
         return data.status === 'success';
 
