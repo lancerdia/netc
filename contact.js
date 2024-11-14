@@ -52,7 +52,7 @@ function hideLoading() {
 }
 
 // 显示消息
-async function showSuccessMessage(message, duration = 1800) {
+async function showSuccessMessage(message, duration = 2000) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -82,7 +82,7 @@ async function showSuccessMessage(message, duration = 1800) {
   messageOverlay.classList.remove('success');
 }
 
-async function showErrorMessage(message, duration = 180000) {
+async function showErrorMessage(message, duration = 2000) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -98,7 +98,7 @@ async function showErrorMessage(message, duration = 180000) {
 
   const messageText = document.createElement('div');
   messageText.classList.add('message-text');
-  messageText.textContent = message.replace('\n', '\n');
+  messageText.innerHTML = message.split('\n').join('<br>');
   messageContainer.appendChild(messageText);
 
   messageOverlay.classList.add('error');
@@ -112,6 +112,7 @@ async function showErrorMessage(message, duration = 180000) {
   messageOverlay.classList.remove('error');
 }
 
+/*
 async function showMessage(message, duration = 1800) {
   // 将原有的单行文字分割成两行
   const lines = message.split('\n');
@@ -121,7 +122,7 @@ async function showMessage(message, duration = 1800) {
   await delay(duration);
   messageOverlay.style.display = 'none';
 }
-
+*/
 // 提交到飞书
 async function submitToFeishu(contact, cid, retryCount = 0) {
     try {
