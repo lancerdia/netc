@@ -30,17 +30,6 @@
   animation: checkmark-draw 0.5s ease-in-out forwards;
 }
 
-.message-container {
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 40px;
-  border-radius: 28px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 /* 失败时的样式 */
 .message-overlay.error {
   justify-content: center;
@@ -70,6 +59,18 @@
   animation: x-draw 0.5s ease-in-out forwards;
 }
 
+.message-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 28px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
 @keyframes x-scale {
   0% {
     transform: scale(0);
@@ -87,6 +88,7 @@
     stroke-dasharray: 100 0;
   }
 }
+
 
 *,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}
 
