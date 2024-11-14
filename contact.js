@@ -52,7 +52,7 @@ function hideLoading() {
 }
 
 // 显示消息
-async function showSuccessMessage(message, duration = 2000) {
+async function showSuccessMessage(message, duration = 2300) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -82,7 +82,7 @@ async function showSuccessMessage(message, duration = 2000) {
   messageOverlay.classList.remove('success');
 }
 
-async function showErrorMessage(message, duration = 2000) {
+async function showErrorMessage(message, duration = 3000) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
