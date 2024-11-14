@@ -52,7 +52,7 @@ function hideLoading() {
 }
 
 // 显示消息
-async function showSuccessMessage(message, duration = 150000) {
+async function showSuccessMessage(message, duration = 1800) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -82,7 +82,7 @@ async function showSuccessMessage(message, duration = 150000) {
   messageOverlay.classList.remove('success');
 }
 
-async function showErrorMessage(message, duration = 150000) {
+async function showErrorMessage(message, duration = 1800) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -112,7 +112,7 @@ async function showErrorMessage(message, duration = 150000) {
   messageOverlay.classList.remove('error');
 }
 
-async function showMessage(message, duration = 1500) {
+async function showMessage(message, duration = 1800) {
   // 将原有的单行文字分割成两行
   const lines = message.split('\n');
   // 更新 messageOverlay 中的文字内容
@@ -121,14 +121,6 @@ async function showMessage(message, duration = 1500) {
   await delay(duration);
   messageOverlay.style.display = 'none';
 }
-
-/*
-async function showMessage(message, duration = 1500) {
-    messageOverlay.querySelector('.message-text').textContent = message;
-    messageOverlay.style.display = 'flex';
-    await delay(duration);
-    messageOverlay.style.display = 'none';
-}*/
 
 // 提交到飞书
 async function submitToFeishu(contact, cid, retryCount = 0) {
@@ -249,13 +241,13 @@ async function submitData(contact, cid) {
         hideLoading();
         
         if (workerSuccess || feishuSuccess) {
-            await showSuccessMessage('已提交\n客服稍候将与您联系');
-            await delay(800);
+            await showSuccessMessage('已提交\n客服稍后将与您联系');
+            await delay(400);
             modalOverlay.style.display = 'none';
             return true;
         } else {
             await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
-            await delay(800);
+            await delay(400);
             modalOverlay.style.display = 'none';
             return false;
         }
@@ -263,7 +255,7 @@ async function submitData(contact, cid) {
         console.error('提交过程发生错误:', error);
         hideLoading();
         await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
-        await delay(800);
+        await delay(400);
         modalOverlay.style.display = 'none';
         return false;
     }
