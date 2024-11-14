@@ -82,7 +82,7 @@ async function showSuccessMessage(message, duration = 1800) {
   messageOverlay.classList.remove('success');
 }
 
-async function showErrorMessage(message, duration = 1800) {
+async function showErrorMessage(message, duration = 180000) {
   const messageOverlay = document.querySelector('.message-overlay');
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('message-container');
@@ -246,7 +246,7 @@ async function submitData(contact, cid) {
             modalOverlay.style.display = 'none';
             return true;
         } else {
-            await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
+            await showErrorMessage('抱歉！提交失败\n请联系我司人员处理');
             await delay(400);
             modalOverlay.style.display = 'none';
             return false;
@@ -254,7 +254,7 @@ async function submitData(contact, cid) {
     } catch (error) {
         console.error('提交过程发生错误:', error);
         hideLoading();
-        await showErrorMessage('抱歉！提交失败\n请联系我司工作人员人工处理');
+        await showErrorMessage('抱歉！提交失败\n请联系我司人员处理');
         await delay(400);
         modalOverlay.style.display = 'none';
         return false;
